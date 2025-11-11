@@ -229,7 +229,6 @@ with st.container(border=True):
 
         st.plotly_chart(fig1, use_container_width=True)
 
-
     with col12:
         torta_reactiva = df_agrupado.sort_values(by='ENERGÍA REACTIVA', ascending=False).head(5)
         fig2 = px.pie(
