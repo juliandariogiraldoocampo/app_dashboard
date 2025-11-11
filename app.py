@@ -216,7 +216,6 @@ with st.container(border=True):
 
         st.plotly_chart(fig, use_container_width=True)
 
-
     col11, col12 = st.columns(2)
     with col11:
         df_torta_activa = df_agrupado.sort_values(by='ENERGÍA ACTIVA', ascending=False).head(5)
