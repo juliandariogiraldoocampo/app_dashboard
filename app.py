@@ -105,9 +105,48 @@ with st.container(border=True):
     with col4:
         st.metric("Número de Municipios", f'{num_mpios}', border=True)
 
-    if st.checkbox('Mostrar detalles del Origen de los datos'):
-        st.write('Conjunto de datos descargados del portal de Datos Abiertos del Gobierno Nacional en:')
-        st.write('https://www.datos.gov.co/Minas-y-Energ-a/Estado-de-la-prestaci-n-del-servicio-de-energ-a-en/3ebi-d83g/about_data')
+    if st.checkbox('Acerca de la Natureleza del Objeto de Análisis y del Dataset'):
+       
+        st.html('''
+                <b><h3>¿Qué son las Zonas No Interconectadas (ZNI)?</h3></b>
+                Para entender mejor los datos, es importante conocer que las Zonas No Interconectadas (ZNI) son áreas del país que no están conectadas a la red eléctrica nacional. Estas zonas suelen depender de fuentes de energía alternativas, como generadores diésel, energía solar o eólica, para satisfacer sus necesidades energéticas. El análisis de los datos de prestación del servicio de energía en estas zonas es crucial para identificar oportunidades de mejora en la infraestructura energética, optimizar el uso de recursos y garantizar un suministro confiable y sostenible para las comunidades que residen en estas áreas.
+                <b><h3>¿Qué son la Energía Activa y Reactiva y la Potencia Máxima?</h3></b>
+            ''')
+        tab1, tab2, tab3 = st.tabs(["ENERGÍA ACTIVA", "ENERGÍA REACTIVA", "POTENCIA MÁXIMA"])
+        with tab1:
+            st.html('''
+            <b><h4>Energía Activa (kWh - kilovatio-hora)</h4></b>
+            Es la energía "útil" o "real" que realiza el trabajo. Es la que se convierte en formas de energía que podemos usar directamente, como:
+            <blockquote>
+            <ul>
+                <li>Luz (iluminación)</li>
+                <li>Calor (estufas, planchas, calentadores)</li>
+                <li>Movimiento (motores de ventiladores, lavadoras, herramientas)</li>
+                <li>Funcionamiento de equipos electrónicos (TV, computadores, neveras)</li>
+            </ul>
+            </blockquote>
+            En términos simples es la energía que "consumimos" de verdad y por la que pagamos la mayor parte de nuestra factura.
+            <br>
+            En el contexto de las ZNI en estas zonas, el costo por kWh de energía activa es significativamente más alto que en el sistema interconectado nacional, debido a los altos costos de generación (generalmente con diésel o combustibles fósiles).
+            ''')
+        with tab2:
+            st.html('''
+            <b><h4>Energía Reactiva (kVARh - kilovoltio-amperio reactivo-hora)</h4></b>
+            Es la energía que no realiza trabajo útil pero es necesaria para mantener los campos eléctricos y magnéticos en equipos como motores, transformadores y dispositivos de iluminación fluorescente. La energía reactiva oscila entre la fuente de energía y la carga sin ser consumida realmente.
+            <br>
+            Aunque no se utiliza directamente para realizar trabajo, la energía reactiva es esencial para el funcionamiento eficiente de muchos equipos eléctricos. Sin embargo, un exceso de energía reactiva puede causar pérdidas en el sistema eléctrico y reducir la capacidad de transmisión de energía activa.
+            <br>
+            En las ZNI, la gestión de la energía reactiva es crucial para optimizar el uso de los recursos energéticos limitados y mejorar la eficiencia del sistema eléctrico local.
+            ''')
+        with tab3:
+            st.html('''
+            <b><h4>Potencia Máxima (kW - kilovatio)</h4></b>
+            Es la máxima cantidad de energía que un sistema eléctrico puede suministrar o consumir en un momento dado. La potencia máxima es importante para dimensionar adecuadamente la infraestructura eléctrica y evitar sobrecargas que puedan causar fallos o daños en el sistema.
+            <br>
+            En las ZNI, controlar y gestionar la potencia máxima es esencial para garantizar un suministro estable y evitar interrupciones en el servicio debido a picos de demanda.
+            ''')
+        st.write('---')
+        st.caption('El conjunto de datos fué obtenido del portal de Datos Abiertos del Gobierno Nacional en: https://www.datos.gov.co/Minas-y-Energ-a/Estado-de-la-prestaci-n-del-servicio-de-energ-a-en/3ebi-d83g/about_data')
 
     with st.expander('Mostrar el dataframe original'):
         st.dataframe(df)
