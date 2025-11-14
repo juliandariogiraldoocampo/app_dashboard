@@ -118,118 +118,126 @@ with st.container(border=True):
 ########################################################################
 #                             MAPA COLOMBIA                            #
 ########################################################################
-st.markdown('<a id="mapa-colombia"></a><br>', unsafe_allow_html=True)
-# Cargar GeoJSON
-with open('data/colombia_energia_zni.geojson', 'r', encoding='utf-8') as f:
-    geojson_data = json.load(f)
-
-# Crear mapa base centrado en Colombia
-m = folium.Map(location=[4.5, -74], zoom_start=6)
-
-# Función para obtener color según valor de ENERGÍA ACTIVA
-def get_color(feature):
-    energia = feature['properties'].get('ENERGÍA ACTIVA')
-    if energia is None or energia == '':
-        return None 
-    
-    # Convertir a número si es string
-    try:
-        energia = float(str(energia).replace(',', ''))
-    except:
-        return None
-    
-    # Escala de colores según valor
-    if energia < 5000000:
-        return "#ee4318"
-    elif energia < 10000000:
-        return "#e07136"
-    elif energia < 50000000:
-        return "#fbc04a"
-    elif energia < 100000000:
-        return "#dedb26"
-    else:
-        return "#71da27"
-
-# Función de estilo para cada feature
-def style_function(feature):
-    color = get_color(feature)
-    if color is None:
-        return {
-            'fillColor': 'transparent',
-            'color': 'gray',
-            'weight': 1,
-            'fillOpacity': 0
-        }
-    return {
-        'fillColor': color,
-        'color': 'black',
-        'weight': 1,
-        'fillOpacity': 0.6
-    }
-
-# Agregar GeoJSON al mapa
-folium.GeoJson(
-    geojson_data,
-    style_function=style_function,
-    tooltip=folium.GeoJsonTooltip(
-        fields=['NOMBRE_DPT', 'ENERGÍA ACTIVA', 'ENERGÍA REACTIVA'],
-        aliases=['Departamento:', 'Energía Activa:', 'Energía Reactiva:']
-    )
-).add_to(m)
-
-# Mostrar mapa en Streamlit
-st.subheader('Mapa de Energía Activa - ZNI Colombia')
-output = st_folium(m,  height=800, use_container_width=True)
-
-# Debug: mostrar el contenido completo del output
-if output:
-    st.write("Contenido de output:", output)
-    
-if output and output.get('last_object_clicked'):
-    # Acceder a las propiedades del feature clickeado
-    props = output.get('last_object_clicked_properties')
-    if props and 'NOMBRE_DPT' in props:
-        nombre_depto = props['NOMBRE_DPT']
-        st.write(f"Departamento seleccionado: {nombre_depto}")
-
-###############################################################################
-#     GRAFICO INTREACTIVO DE BARRAS HORIZONTALES POR DEPARTAMENTO Y AÑO       #
-###############################################################################
-st.markdown('<a id="evolucion-energia-activa"></a><br>', unsafe_allow_html=True)
 with st.container(border=True):
-    st.subheader('Evolución de Energía Activa por Departamento')
+    columna1, columna2 = st.columns([.6,.4])
+    with columna1:
+        st.markdown('<a id="mapa-colombia"></a><br>', unsafe_allow_html=True)
+        # Cargar GeoJSON
+        with open('data/colombia_energia_zni.geojson', 'r', encoding='utf-8') as f:
+            geojson_data = json.load(f)
 
-    # Desplegable para seleccionar departamento
-    depto_selec = st.selectbox(
-        'Selecciona un departamento:',
-        options=departamentos
-    )
-    condicion_filtro = df_depto_anios['DEPARTAMENTO'] == depto_selec
-    df_departamento = df_depto_anios[condicion_filtro]
+        # Crear mapa base centrado en Colombia
+        m = folium.Map(location=[4.5, -74], zoom_start=5)
+
+        # Función para obtener color según valor de ENERGÍA ACTIVA
+        def get_color(feature):
+            energia = feature['properties'].get('ENERGÍA ACTIVA')
+            if energia is None or energia == '':
+                return None 
+            
+            # Convertir a número si es string
+            try:
+                energia = float(str(energia).replace(',', ''))
+            except:
+                return None
+            
+            # Escala de colores según valor
+            if energia < 5_000_000:
+                return "#f04410"
+            elif energia < 50_000_000:
+                return "#e0aa36"
+            elif energia < 100_000_000:
+                return "#f8fb4a"
+            elif energia < 200_000_000:
+                return "#98de26"
+            else:
+                return "#6ef70c"
+
+        # Función de estilo para cada feature
+        def style_function(feature):
+            color = get_color(feature)
+            if color is None:
+                return {
+                    'fillColor': 'transparent',
+                    'color': 'gray',
+                    'weight': 1,
+                    'fillOpacity': 0
+                }
+            return {
+                'fillColor': color,
+                'color': 'black',
+                'weight': 1,
+                'fillOpacity': 0.6
+            }
+
+        # Agregar GeoJSON al mapa
+        folium.GeoJson(
+            geojson_data,
+            style_function=style_function,
+            tooltip=folium.GeoJsonTooltip(
+                fields=['NOMBRE_DPT', 'ENERGÍA ACTIVA', 'ENERGÍA REACTIVA'],
+                aliases=['Departamento:', 'Energía Activa:', 'Energía Reactiva:']
+            )
+        ).add_to(m)
+
+        # Mostrar mapa en Streamlit
+        st.subheader('Mapa de Energía Activa y Reactiva')
+        st.caption('Haz clic en un departamento para ver su evolución de energía activa.')
+        output = st_folium(m,  height=600, use_container_width=True)
+
+        # Capturar el departamento clickeado
+        depto_mapa = None
+        if output and output.get('last_active_drawing'):
+            props = output['last_active_drawing'].get('properties')
+            if props and 'NOMBRE_DPT' in props:
+                depto_mapa = props['NOMBRE_DPT']
+            
+    ###############################################################################
+    #     GRAFICO INTREACTIVO DE BARRAS HORIZONTALES POR DEPARTAMENTO Y AÑO       #
+    ###############################################################################
+
+    with columna2:
+        st.markdown('<a id="evolucion-energia-activa"></a><br>', unsafe_allow_html=True)
+
+        st.subheader('Evolución de Energía Activa')
+
+        # Determinar el índice inicial del selectbox
+        index_inicial = 0
+        if depto_mapa and depto_mapa in departamentos:
+            index_inicial = departamentos.index(depto_mapa)
+        
+        # Desplegable para seleccionar departamento
+        depto_selec = st.selectbox(
+            'Selecciona un departamento:',
+            options=departamentos,
+            index=index_inicial
+        )
+        condicion_filtro = df_depto_anios['DEPARTAMENTO'] == depto_selec
+        df_departamento = df_depto_anios[condicion_filtro]
 
 
-    # Crear gráfico de barras horizontales
-    fig_barras = go.Figure()
+        # Crear gráfico de barras horizontales
+        fig_barras = go.Figure()
 
-    fig_barras.add_trace(go.Bar(
-        x=df_departamento['ENERGÍA ACTIVA'],
-        y=df_departamento['AÑO SERVICIO'].astype(str),
-        orientation='h',
-        marker_color='#4E7F96',
-        text=df_departamento['ENERGÍA ACTIVA'],
-        texttemplate='%{text:,.0f}',
-        textposition='auto',
-    ))
+        fig_barras.add_trace(go.Bar(
+            x=df_departamento['ENERGÍA ACTIVA'],
+            y=df_departamento['AÑO SERVICIO'].astype(str),
+            orientation='h',
+            marker_color='#4E7F96',
+            text=df_departamento['ENERGÍA ACTIVA'],
+            texttemplate='%{text:,.0f}',
+            textposition='auto',
+        ))
 
-    fig_barras.update_layout(
-        height=400,
-        xaxis_title='Energía Activa (kWh)',
-        yaxis_title='Año',
-        showlegend=False,
-        yaxis={'categoryorder': 'category ascending'}
-    )
+        fig_barras.update_layout(
+            height=580,
+            xaxis_title='Energía Activa (kWh)',
+            yaxis_title='Año',
+            showlegend=False,
+            yaxis={'categoryorder': 'category ascending'}
+        )
 
-    st.plotly_chart(fig_barras, use_container_width=True)
+        st.plotly_chart(fig_barras, use_container_width=True)
 
 ########################################################################
 #                             INDICADORES                              #
