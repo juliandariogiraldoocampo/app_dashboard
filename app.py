@@ -105,6 +105,7 @@ with st.container(border=True):
     with col4:
         st.metric("Número de Municipios", f'{num_mpios}', border=True)
 
+    st.caption('Por las grandes diferencias entre los municipios y los datos del Archipiélago de San Andrés, Providencia y Santa Catalina, estos no fueron tenidos en cuenta en los análisis posteriores. Se ha procesado el Dataset para analizar solamente la Colombia continental.')
     with st.expander('Mostrar el dataframe original'):
         st.dataframe(df)
 
