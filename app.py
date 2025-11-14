@@ -161,11 +161,12 @@ with st.container(border=True):
     columna1, columna2 = st.columns(2)
     with columna1:
         st.markdown('<a id="mapa-colombia"></a><br>', unsafe_allow_html=True)
+        
         # Cargar GeoJSON
         with open('data/colombia_energia_zni.geojson', 'r', encoding='utf-8') as f:
             geojson_data = json.load(f)
 
-        # Crear mapa base centrado en Colombia
+        # Crear mapa base
         m = folium.Map(location=[4.5, -74], zoom_start=5)
 
         # Función para obtener color según valor de ENERGÍA ACTIVA
@@ -224,7 +225,8 @@ with st.container(border=True):
         st.caption('Haz clic en un departamento para ver su evolución de energía activa.')
         output = st_folium(m,  height=500, use_container_width=True)
 
-        # Capturar el departamento clickeado
+        # Capturar el nombre del departamento clickeado
+        # para luego llevármelo para el desplegable y el gráfico
         depto_mapa = None
         if output and output.get('last_active_drawing'):
             props = output['last_active_drawing'].get('properties')
@@ -298,7 +300,7 @@ with st.container(border=True):
     )
 
 ########################################################################
-#                      GRAFICOS DE ENERGÍA ACTIVA                      #
+#                      GRAFICS DE ENERGÍA ACTIVA                      #
 ########################################################################
 st.markdown('<a id="graficas-energia"></a><br>', unsafe_allow_html=True)
 with st.container(border=True):
