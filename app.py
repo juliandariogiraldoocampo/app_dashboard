@@ -105,8 +105,10 @@ with st.container(border=True):
     with col4:
         st.metric("Número de Municipios", f'{num_mpios}', border=True)
 
+    with st.expander('Mostrar el dataframe original'):
+        st.dataframe(df)
+
     if st.checkbox('Acerca de la Natureleza del Objeto de Análisis y del Dataset'):
-       
         st.html('''
                 <b><h3>¿Qué son las Zonas No Interconectadas (ZNI)?</h3></b>
                 Para entender mejor los datos, es importante conocer que las Zonas No Interconectadas (ZNI) son áreas del país que no están conectadas a la red eléctrica nacional. Estas zonas suelen depender de fuentes de energía alternativas, como generadores diésel, energía solar o eólica, para satisfacer sus necesidades energéticas. El análisis de los datos de prestación del servicio de energía en estas zonas es crucial para identificar oportunidades de mejora en la infraestructura energética, optimizar el uso de recursos y garantizar un suministro confiable y sostenible para las comunidades que residen en estas áreas.
@@ -126,39 +128,37 @@ with st.container(border=True):
             </ul>
             </blockquote>
             En términos simples es la energía que "consumimos" de verdad y por la que pagamos la mayor parte de nuestra factura.
-            <br>
+            <br><br>
             En el contexto de las ZNI en estas zonas, el costo por kWh de energía activa es significativamente más alto que en el sistema interconectado nacional, debido a los altos costos de generación (generalmente con diésel o combustibles fósiles).
             ''')
         with tab2:
             st.html('''
             <b><h4>Energía Reactiva (kVARh - kilovoltio-amperio reactivo-hora)</h4></b>
             Es la energía que no realiza trabajo útil pero es necesaria para mantener los campos eléctricos y magnéticos en equipos como motores, transformadores y dispositivos de iluminación fluorescente. La energía reactiva oscila entre la fuente de energía y la carga sin ser consumida realmente.
-            <br>
+            <br><br>
             Aunque no se utiliza directamente para realizar trabajo, la energía reactiva es esencial para el funcionamiento eficiente de muchos equipos eléctricos. Sin embargo, un exceso de energía reactiva puede causar pérdidas en el sistema eléctrico y reducir la capacidad de transmisión de energía activa.
-            <br>
+            <br><br>
             En las ZNI, la gestión de la energía reactiva es crucial para optimizar el uso de los recursos energéticos limitados y mejorar la eficiencia del sistema eléctrico local.
             ''')
         with tab3:
             st.html('''
             <b><h4>Potencia Máxima (kW - kilovatio)</h4></b>
             Es la máxima cantidad de energía que un sistema eléctrico puede suministrar o consumir en un momento dado. La potencia máxima es importante para dimensionar adecuadamente la infraestructura eléctrica y evitar sobrecargas que puedan causar fallos o daños en el sistema.
-            <br>
+            <br><br>
             En las ZNI, controlar y gestionar la potencia máxima es esencial para garantizar un suministro estable y evitar interrupciones en el servicio debido a picos de demanda.
             ''')
         st.write('---')
         st.caption('El conjunto de datos fué obtenido del portal de Datos Abiertos del Gobierno Nacional en: https://www.datos.gov.co/Minas-y-Energ-a/Estado-de-la-prestaci-n-del-servicio-de-energ-a-en/3ebi-d83g/about_data')
 
-    with st.expander('Mostrar el dataframe original'):
-        st.dataframe(df)
 
-    with st.expander('Mostrar Datos Energía Reactiva anual por Municipio'):
-        st.dataframe(df_pivote)
+
+    
 
 ########################################################################
 #                             MAPA COLOMBIA                            #
 ########################################################################
 with st.container(border=True):
-    columna1, columna2 = st.columns([.6,.4])
+    columna1, columna2 = st.columns(2)
     with columna1:
         st.markdown('<a id="mapa-colombia"></a><br>', unsafe_allow_html=True)
         # Cargar GeoJSON
@@ -197,10 +197,10 @@ with st.container(border=True):
             color = get_color(feature)
             if color is None:
                 return {
-                    'fillColor': 'transparent',
-                    'color': 'gray',
+                    'fillColor': '#3d3d3d',
+                    'color': '#3d3d3d',
                     'weight': 1,
-                    'fillOpacity': 0
+                    'fillOpacity': 0.2
                 }
             return {
                 'fillColor': color,
@@ -214,15 +214,15 @@ with st.container(border=True):
             geojson_data,
             style_function=style_function,
             tooltip=folium.GeoJsonTooltip(
-                fields=['NOMBRE_DPT', 'ENERGÍA ACTIVA', 'ENERGÍA REACTIVA'],
-                aliases=['Departamento:', 'Energía Activa:', 'Energía Reactiva:']
+                fields=['NOMBRE_DPT', 'ENERGÍA ACTIVA', 'ENERGÍA REACTIVA', 'POTENCIA MÁXIMA'],
+                aliases=['Departamento:', 'Energía Activa:', 'Energía Reactiva:', 'Potencia Máxima:']
             )
         ).add_to(m)
 
         # Mostrar mapa en Streamlit
-        st.subheader('Mapa de Energía Activa y Reactiva')
+        st.subheader('Mapa Datos de Energía en ZNI')
         st.caption('Haz clic en un departamento para ver su evolución de energía activa.')
-        output = st_folium(m,  height=600, use_container_width=True)
+        output = st_folium(m,  height=500, use_container_width=True)
 
         # Capturar el departamento clickeado
         depto_mapa = None
@@ -269,7 +269,7 @@ with st.container(border=True):
         ))
 
         fig_barras.update_layout(
-            height=580,
+            height=480,
             xaxis_title='Energía Activa (kWh)',
             yaxis_title='Año',
             showlegend=False,
